@@ -1,6 +1,6 @@
 package com.cbfacademy.Baby.Classes.Kent;
 
-import com.cbfacademy.BabyClassEntity.PostcodeResponse.Result;
+import com.cbfacademy.Baby.Classes.Kent.PostcodeResponse.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
