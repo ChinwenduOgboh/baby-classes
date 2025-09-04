@@ -25,7 +25,7 @@ public class BabyClassService {
         return repository.save(babyClass);
     }
 
-    public BabyClassEntity updateClass(UUID id, Babyclasseskent updatedClass) {
+    public BabyClassEntity updateClass(UUID id, BabyClassEntity updatedClass) {
         return repository.findById(id).map(existing -> {
             existing.setName(updatedClass.getName());
             existing.setDescription(updatedClass.getDescription());
@@ -37,7 +37,6 @@ public class BabyClassService {
             existing.setPostcode(updatedClass.getPostcode());
             existing.setLatitude(updatedClass.getLatitude());
             existing.setLongitude(updatedClass.getLongitude());
-            existing.setSchedules(updatedClass.getSchedules());
             return repository.save(existing);
         }).orElseThrow(null);
     }
