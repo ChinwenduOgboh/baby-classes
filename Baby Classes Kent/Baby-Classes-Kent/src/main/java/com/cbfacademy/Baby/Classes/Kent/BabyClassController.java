@@ -64,5 +64,10 @@ public class BabyClassController {
     public List<BabyClassEntity> getByAge(@PathVariable int months) {
         return service.getClassesByAge(months);
     }
-
+    @GetMapping("/upcoming")
+    public List<BabyClassEntity> getUpcomingClasses() {
+        return service.getUpcomingClassesWithSchedules();
+    }
 }
+
+

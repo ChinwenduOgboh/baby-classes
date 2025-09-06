@@ -1,9 +1,13 @@
 package com.cbfacademy.Baby.Classes.Kent;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +39,6 @@ public class BabyClassService {
             existing.setType(updatedClass.getType());
             existing.setCity(updatedClass.getCity());
             existing.setPostcode(updatedClass.getPostcode());
-            existing.setLatitude(updatedClass.getLatitude());
-            existing.setLongitude(updatedClass.getLongitude());
             return repository.save(existing);
         }).orElseThrow(null);
     }
@@ -55,6 +57,20 @@ public class BabyClassService {
     }
     public List<BabyClassEntity> getClassesByCity(String city) {
         return repository.findByCityContainingIgnoreCase(city);
+    }
+    public List<BabyClassEntity> getUpcomingClassesWithSchedules() {
+        List<BabyClassEntity> classes = repository.findAll().stream()
+                .filter(bc -> bc.getSchedules() != null && !bc.getSchedules().isEmpty())
+                .map(bc -> {
+                    List<BabyClassSchedule> upcomingSchedules = bc.getSchedules().stream()
+                            .filter(s -> s.getStartTime() != null && s.getStartTime().isAfter(LocalDateTime.now()))
+                            .collect(Collectors.toList());
+                    bc.setSchedules(upcomingSchedules);
+                    return bc;
+                })
+                .filter(bc -> !bc.getSchedules().isEmpty())
+                .collect(Collectors.toList());
+        return classes;
     }
 }
    

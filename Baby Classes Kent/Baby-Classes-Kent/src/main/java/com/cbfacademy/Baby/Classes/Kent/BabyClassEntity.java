@@ -1,54 +1,42 @@
 package com.cbfacademy.Baby.Classes.Kent;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
-import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "baby_class")
 public class BabyClassEntity {
 
-   @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(updatable = false, nullable = false)
+    public enum ClassType { music, art, sensory, swimming, playgroup, other }
+
+    @Id
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
     private String name;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
-
-    @Enumerated(EnumType.STRING)
-    private ClassType type; // music, swimming, sensory, etc.
-
-    public enum ClassType {
-    music,
-    swimming,
-    sensory,
-    art,
-    playgroup,
-    other
-    }
-
-    @Column(name = "min_age_months")
-    private int minAgeMonths;
-
-    @Column(name = "max_age_months")
-    private int maxAgeMonths;
-
     private String address;
     private String city;
     private String postcode;
-    private Double latitude;
-    private Double longitude;
+    private int minAgeMonths;
+    private int maxAgeMonths;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    private ClassType type;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private double latitude;
+    private double longitude;
+
+    @OneToMany(mappedBy = "babyClass", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<BabyClassSchedule> schedules;
+
+    // Getters and Setters
+    public List<BabyClassSchedule> getSchedules() { return schedules; }
+    public void setSchedules(List<BabyClassSchedule> schedules) { this.schedules = schedules; }
 
     // Getters and Setters
     public UUID getId() {
@@ -117,18 +105,17 @@ public class BabyClassEntity {
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public void addSchedule(BabyClassSchedule schedule) {
+        schedules.add(schedule);
+        schedule.setBabyClass(this);
     }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+
+    public void removeSchedule(BabyClassSchedule schedule) {
+        schedules.remove(schedule);
+        schedule.setBabyClass(null);
     }
 }
+
+
 
 
