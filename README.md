@@ -31,6 +31,5 @@ The project is developed using Test-Driven Development (TDD), with unit and inte
 - Maven Wrapper ('./mvnw') for build and test automation
 
 ## Database 
-- MySQL database dump located cbfacademy\baby-classes\Baby Classes Kent\baby_class.babyclassesdump.sql
-
+- MySQL database dump located [## Database](https://github.com/ChinwenduOgboh/baby-classes/blob/cde2adaa3a9722542fea594705a4d8cf90589555/Baby%20Classes%20Kent/babyclassesdump.sql)
 
