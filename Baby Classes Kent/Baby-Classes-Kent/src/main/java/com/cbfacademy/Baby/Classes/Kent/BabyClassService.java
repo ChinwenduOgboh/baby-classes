@@ -46,18 +46,14 @@ public class BabyClassService {
     public void deleteClass(UUID id) {
         repository.deleteById(id);
     }
-    public List<BabyClassEntity> getByLocation(String location) {
-        return repository.findByCityContainingIgnoreCase(location);
-    }
+    
     public List<BabyClassEntity> getClassesByType(BabyClassEntity.ClassType type) {
         return repository.findByType(type);
     }
     public List<BabyClassEntity> getClassesByAge(int months) {
         return repository.findByMinAgeMonthsLessThanEqualAndMaxAgeMonthsGreaterThanEqual(months, months);
     }
-    public List<BabyClassEntity> getClassesByCity(String city) {
-        return repository.findByCityContainingIgnoreCase(city);
-    }
+    
     public List<BabyClassEntity> getUpcomingClassesWithSchedules() {
         List<BabyClassEntity> classes = repository.findAll().stream()
                 .filter(bc -> bc.getSchedules() != null && !bc.getSchedules().isEmpty())

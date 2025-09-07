@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,13 +26,6 @@ public class BabyClassController {
         this.service = service;
     } // Constructor injection for better testability and immutability.
 
-    @GetMapping
-    public List<BabyClassEntity> getClasses(@RequestParam(required = false) String location) {
-        if (location != null) {
-            return service.getByLocation(location);
-        }
-        return service.getAllClasses();
-    }
 
     @GetMapping("/{id}")
     public BabyClassEntity getClass(@PathVariable UUID id) {

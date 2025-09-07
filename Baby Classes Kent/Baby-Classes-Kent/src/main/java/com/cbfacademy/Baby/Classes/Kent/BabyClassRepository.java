@@ -23,7 +23,8 @@ public interface BabyClassRepository extends JpaRepository<BabyClassEntity, UUID
     // Find classes suitable for a specific age range
     List<BabyClassEntity> findByMinAgeMonthsLessThanEqualAndMaxAgeMonthsGreaterThanEqual(int ageMin, int ageMax);
 
-    //Search by city
-    List<BabyClassEntity> findByCityContainingIgnoreCase(String city);
+    //Search by city or postcode (case insensitive, partial match)
+    @Query("SELECT b FROM BabyClassEntity b WHERE LOWER(b.postcode) LIKE LOWER(CONCAT('%', :postcode, '%'))")
+    List<BabyClassEntity> findByPostcodeContains(String postcode);
 
 }

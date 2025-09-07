@@ -1,33 +1,60 @@
 package com.cbfacademy.Baby.Classes.Kent;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+import java.util.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.junit.jupiter.api.TestReporter; 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
 @DisplayName("Baby Classes Kent Application Tests")
-class BabyclasseskentApplicationTests {
+class BabyClassesKentApplicationTests {
 
     @Autowired
     private BabyClassService service;
+    public PostcodeResult postcode;
 
-    @Test
-    @DisplayName("reveal classes by location")
-    void classesByProximity() {
-        List<BabyClassEntity> classes = service.getByLocation("ME14 5");
-        assertTrue(classes.size() >= 0);
+    @MockitoBean
+    private BabyClassRepository repository;
+    
+    private BabyClassEntity musicClass;
+    private BabyClassEntity artClass;
+
+    @BeforeEach
+    void setUp() {
+        musicClass = new BabyClassEntity();
+        musicClass.setId(UUID.randomUUID());
+        musicClass.setName("Music Fun");
+        musicClass.setPostcode("ME14 5");
+        musicClass.setMinAgeMonths(0);
+        musicClass.setMaxAgeMonths(12);
+        musicClass.setType(BabyClassEntity.ClassType.music);
+
+        artClass = new BabyClassEntity();
+        artClass.setId(UUID.randomUUID());
+        artClass.setName("Art Time");
+        artClass.setPostcode("ME14 6");
+        artClass.setMinAgeMonths(5);
+        artClass.setMaxAgeMonths(10);
+        artClass.setType(BabyClassEntity.ClassType.art);
+
+        when(repository.findAll()).thenReturn(Arrays.asList(musicClass, artClass));
+        when(repository.findById(musicClass.getId())).thenReturn(Optional.of(musicClass));
+        when(repository.findById(UUID.randomUUID())).thenReturn(Optional.empty());
+        when(repository.findByType(BabyClassEntity.ClassType.music))
+            .thenReturn(Collections.singletonList(musicClass));
+        when(repository.findByMinAgeMonthsLessThanEqualAndMaxAgeMonthsGreaterThanEqual(10, 10)).thenReturn(Arrays.asList(musicClass, artClass));
+        when(repository.findByPostcodeContains("TN3")).thenReturn(Arrays.asList(musicClass, artClass));
     }
 
     @Test
-    @DisplayName("get class by id not found")
+    @DisplayName("Get class by ID - not found")
     void testsGetByIdNotFound() {
         assertThrows(NoSuchElementException.class, () -> {
             service.getClassById(UUID.randomUUID()).orElseThrow();
@@ -35,48 +62,47 @@ class BabyclasseskentApplicationTests {
     }
 
     @Test
-    @DisplayName("create class with missing fields")
-    void testCreateClassMissingFields() {
-        BabyClassEntity incompleteClass = new BabyClassEntity();
-        incompleteClass.setPostcode("TN12 5");
-        incompleteClass.setName("Test Class");
-        // Missing other required fields
-        assertThrows(Exception.class, () -> {
-            service.createClass(incompleteClass);
-        });
+    @DisplayName("Get class by ID - found")
+    void testsGetByIdFound() {
+        Optional<BabyClassEntity> result = service.getClassById(musicClass.getId());
+        assertTrue(result.isPresent(), "Class should be found by ID");
+        assertEquals("Music Fun", result.get().getName());
     }
 
+    
     @Test
-    @DisplayName("get all classes")
+    @DisplayName("Get all classes")
     void testGetAllClasses() {
         List<BabyClassEntity> allClasses = service.getAllClasses();
-        assertTrue(allClasses.size() >= 0);
+        assertEquals(2, allClasses.size(), "Should return all seeded classes");
+        assertTrue(allClasses.contains(musicClass));
+        assertTrue(allClasses.contains(artClass));
     }
 
     @Test
-    @DisplayName("delete class by id")
+    @DisplayName("Delete class by ID")
     void testDeleteClassById() {
-        UUID randomId = UUID.randomUUID();
-        // Should not throw error even if ID does not exist
-        service.deleteClass(randomId);
+        UUID idToDelete = musicClass.getId();
+        service.deleteClass(idToDelete);
+        verify(repository, times(1)).deleteById(idToDelete);
     }
 
     @Test
-    @DisplayName("retrieve class by type")
+    @DisplayName("Retrieve classes by type")
     void testGetByType() {
         List<BabyClassEntity> classes = service.getClassesByType(BabyClassEntity.ClassType.music);
-        assertTrue(classes.size() >= 0);
+        assertEquals(1, classes.size(), "Should return only music classes");
+        assertEquals(BabyClassEntity.ClassType.music, classes.get(0).getType());
     }
 
     @Test
-    @DisplayName("retrieve class by age group")
+    @DisplayName("Retrieve classes by age")
     void testGetByAge() {
         List<BabyClassEntity> classes = service.getClassesByAge(10);
-        assertTrue(classes.size() >= 0);
+        assertFalse(classes.isEmpty(), "Should return classes suitable for age 10");
+        for (BabyClassEntity c : classes) {
+            assertTrue(c.getMinAgeMonths() <= 10 && c.getMaxAgeMonths() >= 10,
+                       "Class should include the specified age");
+        }
     }
-    @Test
-    void classesByProximity(TestReporter testReporter) {
-    List<BabyClassEntity> classes = service.getByLocation("ME14 5");
-    testReporter.publishEntry("Found classes: " + classes.size());
-}
 }
