@@ -30,5 +30,7 @@ The project is developed using Test-Driven Development (TDD), with unit and inte
 - JUnit 5 & Mockito (testing)
 - Maven Wrapper ('./mvnw') for build and test automation
 
+## Database 
+- MySQL database dump located cbfacademy\baby-classes\Baby Classes Kent\baby_class.babyclassesdump.sql
 
 
